@@ -10,7 +10,6 @@ class AuthServerApplicationTests {
 
     @Test
     void contextLoads() {
-        PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-        System.out.println(passwordEncoder.encode("testSecret : " + passwordEncoder.encode("testSecret")));
+
     }
 }
