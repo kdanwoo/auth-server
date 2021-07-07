@@ -13,5 +13,6 @@ public class CommonConfiguration {
     private String tokenType;
     private String clientId;
     private String clientSecret;
+    private String clientServerUrl;
 
 }

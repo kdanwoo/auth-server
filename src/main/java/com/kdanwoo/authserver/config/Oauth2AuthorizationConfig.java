@@ -19,6 +19,8 @@ import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFacto
 
 import javax.sql.DataSource;
 
+import static java.lang.String.valueOf;
+
 /**
  * id/password 기반 Oauth2 인증을 담당하는 서버
  * 다음 endpont가 자동 생성 된다.
@@ -33,6 +35,7 @@ public class Oauth2AuthorizationConfig extends AuthorizationServerConfigurerAdap
     private final PasswordEncoder passwordEncoder;
     private final DataSource dataSource;
     private final CustomUserDetailService userDetailService;
+    private final CommonConfiguration commonConfiguration;
 
     /**
      * 클라이언트 정보 주입 방식을 jdbcdetail로 변경
@@ -54,8 +57,18 @@ public class Oauth2AuthorizationConfig extends AuthorizationServerConfigurerAdap
      */
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        super.configure(endpoints);
-        endpoints.accessTokenConverter(jwtAccessTokenConverter());
+        switch (valueOf(commonConfiguration.getTokenType())){
+            case "BEARER":
+                endpoints.tokenStore(new JdbcTokenStore(dataSource));
+                break;
+            case "JWT":
+                super.configure(endpoints);
+                endpoints.accessTokenConverter(jwtAccessTokenConverter());
+                        //.userDetailsService(userDetailService);
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + valueOf(commonConfiguration.getTokenType()));
+        }
     }
 
     /**
@@ -69,6 +82,10 @@ public class Oauth2AuthorizationConfig extends AuthorizationServerConfigurerAdap
         return converter;
     }
 
+    /**
+     * ResourceServer에서 토큰 검증 요청을 Authorization 서버로 보낼때 /oauth/check_token 을 호출
+     * 해당 요청을 받기위해 설정을 추가함
+     * */
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
         security.tokenKeyAccess("permitAll()")

@@ -32,6 +32,8 @@ common:
   token-type: JWT
   client-id: testClientId
   client-secret: testSecret
+  client-server-url: http://localhost:8081/client/authorization
+
 
 
 logging:

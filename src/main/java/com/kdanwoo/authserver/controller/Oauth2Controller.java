@@ -29,28 +29,53 @@ public class Oauth2Controller {
     private final RestTemplate restTemplate;
     private final CommonConfiguration commonConfiguration;
 
-    @GetMapping(value = "/callback")
-    public OAuthToken callbackSocial(@RequestParam String code) {
+//    @GetMapping(value = "/callback")
+//    public OAuthToken callbackSocial(@RequestParam String code) {
+//
+//        String credentials = commonConfiguration.getClientId() + ":" + commonConfiguration.getClientSecret();
+//        String encodedCredentials = new String(Base64.encodeBase64(credentials.getBytes()));
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+//        headers.add("Authorization", "Basic " + encodedCredentials);
+//
+//
+//        // 인증 서버로부터 Access Token 을 발급 받기 위해 필요한 파라미터 생성
+//        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+//        params.add("code", code);
+//        params.add("grant_type", "authorization_code"); // 권한 코드 승인 방식을 사용
+//        params.add("redirect_uri", "http://localhost:8082/oauth2/callback");
+//        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+//
+//        // Access Token 발급 요청
+//        ResponseEntity<String> response = restTemplate.postForEntity("http://localhost:8082/oauth/token", request, String.class);
+//        if (response.getStatusCode() == HttpStatus.OK) {
+//            return gson.fromJson(response.getBody(), OAuthToken.class);
+//        }
+//        return null;
+//    }
+
+    @GetMapping(value = "/token/refresh")
+    public OAuthToken refreshToken(@RequestParam String refreshToken) {
 
         String credentials = commonConfiguration.getClientId() + ":" + commonConfiguration.getClientSecret();
         String encodedCredentials = new String(Base64.encodeBase64(credentials.getBytes()));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.add("Accept", MediaType.APPLICATION_JSON_VALUE);
         headers.add("Authorization", "Basic " + encodedCredentials);
 
-        // 인증 서버로부터 Access Token 을 발급 받기 위해 필요한 파라미터 생성
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("code", code);
-        params.add("grant_type", "authorization_code"); // 권한 코드 승인 방식을 사용
-        params.add("redirect_uri", "http://localhost:8082/oauth2/callback");
+        params.add("refresh_token", refreshToken);
+        params.add("grant_type", "refresh_token");
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
-
-        // Access Token 발급 요청
         ResponseEntity<String> response = restTemplate.postForEntity("http://localhost:8082/oauth/token", request, String.class);
         if (response.getStatusCode() == HttpStatus.OK) {
             return gson.fromJson(response.getBody(), OAuthToken.class);
         }
         return null;
     }
+
+
 }
