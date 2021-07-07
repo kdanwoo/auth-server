@@ -17,7 +17,7 @@ spring:
     driver-class-name: org.h2.Driver
 
   jpa:
-    atabase-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.H2Dialect
     properties.hibernate.hbm2ddl.auto: update # 해당의미?
     showSql: true
 
@@ -25,6 +25,14 @@ security:
   oauth2:
     jwt:
       signkey: 123@#$
+
+# 인증서버 관련 커스텀 설정
+common:
+  # token-type : JWT or BEARER
+  token-type: JWT
+  client-id: testClientId
+  client-secret: testSecret
+
 
 logging:
   level:
